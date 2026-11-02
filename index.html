@@ -1,108 +1,95 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#101827">
-  <title>Personal Finance Tracker</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    :root { color-scheme: dark; --bg:#101827; --panel:#1b2738; --muted:#9aa8bb; --text:#f4f7fb; --green:#35c98a; --red:#ff7777; --blue:#75a7ff; }
-    * { box-sizing:border-box; }
-    body { margin:0; padding:calc(20px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); background:var(--bg); color:var(--text); font:16px/1.45 system-ui,-apple-system,sans-serif; }
-    .app { max-width:520px; margin:auto; }
-    .top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:22px; }
-    h1 { margin:0; font-size:23px; }
-    .sub,.muted { color:var(--muted); font-size:13px; }
-    .pill { border:1px solid #34445b; border-radius:999px; padding:7px 11px; color:var(--muted); font-size:12px; }
-    .balance { background:linear-gradient(135deg,#263d5c,#1b2b42); border:1px solid #344b68; border-radius:20px; padding:20px; margin-bottom:16px; }
-    .balance .amount { font-size:32px; font-weight:750; margin:6px 0 2px; letter-spacing:-.7px; }
-    .cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
-    .card { background:var(--panel); border:1px solid #2b394d; border-radius:16px; padding:15px; }
-    .card .value { font-size:20px; font-weight:700; margin-top:7px; }
-    .income { color:var(--green); } .expense { color:var(--red); }
-    .section-title { font-size:17px; font-weight:700; margin:22px 0 12px; }
-    .actions { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-    button { border:0; border-radius:13px; padding:14px 12px; color:#101827; background:#dce8f8; font:600 14px system-ui; cursor:pointer; }
-    button.primary { background:var(--green); }
-    button.secondary { background:#2a3b53; color:var(--text); border:1px solid #3a4d67; }
-    .accounts { display:grid; gap:10px; }
-    .account { display:flex; justify-content:space-between; align-items:center; gap:12px; background:var(--panel); border:1px solid #2b394d; border-radius:14px; padding:14px; }
-    .account strong { display:block; }
-    .account .right { text-align:right; font-weight:650; }
-    .nav { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-top:22px; }
-    .nav button { padding:11px 5px; font-size:12px; background:#202e42; color:var(--muted); }
-    .nav button.active { color:#101827; background:var(--green); }
-    .notice { margin-top:18px; color:var(--muted); font-size:12px; text-align:center; }
-    #message { min-height:20px; color:var(--blue); font-size:13px; margin-top:12px; text-align:center; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<title>My Finance</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#101827;--panel:#1b2738;--muted:#9aa8bb;--text:#f4f7fb;--green:#35c98a;--red:#ff7777;--line:#304057}
+*{box-sizing:border-box}body{margin:0;padding:calc(18px + env(safe-area-inset-top)) 15px calc(24px + env(safe-area-inset-bottom));background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,sans-serif}
+.app{max-width:540px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}h1{font-size:23px;margin:0}.muted,.hint{color:var(--muted);font-size:12px}.currency{border:1px solid var(--line);padding:6px 10px;border-radius:30px;font-size:12px;color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:16px;margin-bottom:13px}.hero{background:linear-gradient(135deg,#263d5c,#1b2b42);border-color:#3a5271}.hero .big{font-size:30px;font-weight:750;margin:5px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric .value{font-size:19px;font-weight:700;margin-top:5px}.income{color:var(--green)}.expense{color:var(--red)}
+h2{font-size:17px;margin:20px 0 10px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+button{border:0;border-radius:12px;padding:13px 11px;background:#dce8f8;color:#101827;font-weight:650;font-size:14px;cursor:pointer}button.primary{background:var(--green)}button.secondary{background:#2a3b53;color:var(--text);border:1px solid #3a4d67}button.danger{background:#63343c;color:#fff}
+.nav{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#101827;padding:10px 0 calc(6px + env(safe-area-inset-bottom));margin-top:18px}
+.nav button{background:#202e42;color:var(--muted);padding:10px 3px;font-size:11px}.nav button.active{background:var(--green);color:#101827}
+.account,.transaction{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.account:last-child,.transaction:last-child{border-bottom:0}
+.right{text-align:right;font-weight:650}.tag{font-size:11px;color:var(--muted)}
+label{display:block;font-size:13px;color:#c7d2e1;margin:12px 0 5px}input,select,textarea{width:100%;border:1px solid #3a4d67;background:#111d2d;color:var(--text);border-radius:10px;padding:12px;font:14px system-ui}textarea{min-height:70px;resize:vertical}.form-actions{display:flex;gap:9px;margin-top:16px}.form-actions button{flex:1}
+.page{display:none}.page.active{display:block}.empty{padding:20px;text-align:center;color:var(--muted);font-size:13px}.note{font-size:11px;color:var(--muted);text-align:center;margin:14px 0}
+</style>
 </head>
 <body>
-  <main class="app">
-    <header class="top">
-      <div><h1>My Finance</h1><div class="sub">Personal Finance Tracker</div></div>
-      <div class="pill" id="currency">USD · KHR</div>
-    </header>
+<main class="app">
+<header class="top"><div><h1>My Finance</h1><div class="muted">Personal Finance Tracker</div></div><div class="currency">USD · KHR</div></header>
 
-    <section class="balance">
-      <div class="muted">Tracked balance</div>
-      <div class="amount">0.00 USD</div>
-      <div class="sub">Activity from your tracker start date</div>
-    </section>
+<section id="home" class="page active">
+ <div class="panel hero"><div class="muted">Tracked balance</div><div class="big" id="totalBalance">0.00 USD</div><div class="hint">Activity from your tracker start date</div></div>
+ <div class="grid">
+  <div class="panel metric"><div class="muted">Income</div><div class="value income" id="incomeTotal">0.00 USD</div></div>
+  <div class="panel metric"><div class="muted">Expenses</div><div class="value expense" id="expenseTotal">0.00 USD</div></div>
+  <div class="panel metric"><div class="muted">Savings</div><div class="value" id="savingTotal">0.00 USD</div></div>
+  <div class="panel metric"><div class="muted">Net cash flow</div><div class="value" id="netTotal">0.00 USD</div></div>
+ </div>
+ <h2>Quick actions</h2><div class="actions">
+  <button class="primary" data-new="Income">＋ Add income</button><button data-new="Expense">－ Add expense</button>
+  <button class="secondary" data-new="Saving">＋ Add saving</button><button class="secondary" data-new="Transfer">⇄ Transfer</button>
+ </div>
+ <h2>Your accounts</h2><div class="panel">
+  <div class="account"><div><strong>ABA USD</strong><div class="tag">Checking account</div></div><div class="right" id="abaBalance">0.00 USD</div></div>
+  <div class="account"><div><strong>Canadia KHR</strong><div class="tag">Checking account</div></div><div class="right" id="canadiaBalance">0 KHR</div></div>
+ </div>
+ <h2>Recent activity</h2><div class="panel" id="recent"><div class="empty">No transactions recorded.</div></div>
+</section>
 
-    <section class="cards">
-      <div class="card"><div class="muted">Income</div><div class="value income">0.00 USD</div></div>
-      <div class="card"><div class="muted">Expenses</div><div class="value expense">0.00 USD</div></div>
-      <div class="card"><div class="muted">Savings</div><div class="value">0.00 USD</div></div>
-      <div class="card"><div class="muted">Net cash flow</div><div class="value">0.00 USD</div></div>
-    </section>
+<section id="add" class="page">
+ <h2 id="formTitle">Add transaction</h2>
+ <div class="panel">
+  <form id="transactionForm">
+   <label for="type">Transaction type</label><select id="type"><option>Income</option><option>Expense</option><option>Saving</option><option>Transfer</option></select>
+   <label for="category">Category or source</label><select id="category"></select>
+   <label for="amount">Amount</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="Enter amount" required>
+   <label for="currencySelect">Currency</label><select id="currencySelect"><option>USD</option><option>KHR</option></select>
+   <label for="date">Date</label><input id="date" type="date" required>
+   <label for="account">Account</label><select id="account"><option value="ABA USD">ABA USD</option><option value="Canadia KHR">Canadia KHR</option></select>
+   <label for="description">Description (optional)</label><textarea id="description" placeholder="Add a note"></textarea>
+   <div class="form-actions"><button type="button" class="secondary" id="cancelForm">Cancel</button><button type="submit" class="primary">Save preview</button></div>
+  </form>
+  <p class="hint">Preview only. This form does not save to Google Sheets yet.</p>
+ </div>
+</section>
 
-    <div class="section-title">Quick actions</div>
-    <section class="actions">
-      <button class="primary" data-action="Income">＋ Add income</button>
-      <button data-action="Expense">－ Add expense</button>
-      <button class="secondary" data-action="Saving">＋ Add saving</button>
-      <button class="secondary" data-action="Transfer">⇄ Transfer</button>
-    </section>
+<section id="activity" class="page"><h2>Transactions</h2><div class="panel" id="allTransactions"><div class="empty">No transactions recorded.</div></div></section>
+<section id="reports" class="page"><h2>Reports</h2><div class="panel"><div class="muted">Report periods</div><div class="actions" style="margin-top:12px"><button class="secondary">Daily</button><button class="secondary">Weekly</button><button class="secondary">Monthly</button><button class="secondary">Quarterly</button><button class="secondary">Yearly</button></div><p class="hint">Report calculations will connect to your transaction database later.</p></div></section>
+<section id="settings" class="page"><h2>Settings</h2><div class="panel"><div class="account"><div><strong>Timezone</strong><div class="tag">Asia/Phnom_Penh</div></div></div><div class="account"><div><strong>Supported currencies</strong><div class="tag">USD and KHR</div></div></div><div class="account"><div><strong>Reporting currency</strong><div class="tag">USD</div></div></div><div class="account"><div><strong>Opening balances</strong><div class="tag">Start from zero</div></div></div></div></section>
 
-    <div class="section-title">Your accounts</div>
-    <section class="accounts">
-      <div class="account"><div><strong>ABA USD</strong><span class="muted">Checking account</span></div><div class="right">0.00 USD</div></div>
-      <div class="account"><div><strong>Canadia KHR</strong><span class="muted">Checking account</span></div><div class="right">0 KHR</div></div>
-    </section>
-
-    <nav class="nav" aria-label="Main navigation">
-      <button class="active" data-tab="Home">Home</button>
-      <button data-tab="Transactions">Activity</button>
-      <button data-tab="Reports">Reports</button>
-      <button data-tab="Settings">Settings</button>
-    </nav>
-    <div id="message" role="status"></div>
-    <div class="notice">Starter preview. Live balances and transactions will connect in later phases.</div>
-  </main>
-
-  <script>
-    const tg = window.Telegram && window.Telegram.WebApp;
-    if (tg) {
-      tg.ready();
-      tg.expand();
-    }
-
-    document.querySelectorAll("[data-action]").forEach(button => {
-      button.addEventListener("click", () => {
-        document.getElementById("message").textContent =
-          button.dataset.action + " form will be connected in the transaction phase.";
-      });
-    });
-
-    document.querySelectorAll("[data-tab]").forEach(button => {
-      button.addEventListener("click", () => {
-        document.querySelectorAll("[data-tab]").forEach(item => item.classList.remove("active"));
-        button.classList.add("active");
-        document.getElementById("message").textContent =
-          button.dataset.tab + " page will be built in a later step.";
-      });
-    });
-  </script>
+<nav class="nav">
+ <button class="active" data-page="home">Home</button><button data-page="activity">Activity</button><button data-page="reports">Reports</button><button data-page="settings">Settings</button>
+</nav>
+<p class="note" id="status">Starter interface. Live data connection comes later.</p>
+</main>
+<script>
+const tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand();}
+const categoryMap={
+ Income:["Salary","Bonus","Gift","Others"],
+ Expense:["Food","Transportation","Shopping","Bills","Entertainment","Healthcare","Others"],
+ Saving:["Personal","Future","Emergency Fund","Investment","Others"],
+ Transfer:["General Transfer","Saving"]
+};
+const records=[];
+const money=(n,c)=>c==="KHR"?Math.round(n).toLocaleString()+" KHR":Number(n).toFixed(2)+" USD";
+function showPage(name){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===name));document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===name));}
+function updateCategories(){const type=document.getElementById("type").value;const select=document.getElementById("category");select.innerHTML="";categoryMap[type].forEach(c=>{const o=document.createElement("option");o.textContent=c;select.appendChild(o);});}
+function render(){const totals={Income:0,Expense:0,Saving:0};records.forEach(r=>{if(totals[r.type]!==undefined&&r.currency==="USD")totals[r.type]+=r.amount;});document.getElementById("incomeTotal").textContent=money(totals.Income,"USD");document.getElementById("expenseTotal").textContent=money(totals.Expense,"USD");document.getElementById("savingTotal").textContent=money(totals.Saving,"USD");document.getElementById("netTotal").textContent=money(totals.Income-totals.Expense,"USD");document.getElementById("totalBalance").textContent=money(totals.Income-totals.Expense,"USD");const rows=records.slice().reverse().map(r=>`<div class="transaction"><div><strong>${r.type} · ${r.category}</strong><div class="tag">${r.date} · ${r.account}</div></div><div class="right">${money(r.amount,r.currency)}</div></div>`).join("")||'<div class="empty">No transactions recorded.</div>';document.getElementById("recent").innerHTML=rows;document.getElementById("allTransactions").innerHTML=rows;}
+function openForm(type){document.getElementById("type").value=type;updateCategories();document.getElementById("formTitle").textContent="Add "+type.toLowerCase();document.getElementById("date").value=new Date().toISOString().slice(0,10);showPage("add");}
+document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+document.querySelectorAll("[data-new]").forEach(b=>b.addEventListener("click",()=>openForm(b.dataset.new)));
+document.getElementById("type").addEventListener("change",updateCategories);
+document.getElementById("cancelForm").addEventListener("click",()=>showPage("home"));
+document.getElementById("transactionForm").addEventListener("submit",e=>{e.preventDefault();const amount=Number(document.getElementById("amount").value);if(!(amount>0))return;records.push({type:document.getElementById("type").value,category:document.getElementById("category").value,amount,currency:document.getElementById("currencySelect").value,date:document.getElementById("date").value,account:document.getElementById("account").value});render();e.target.reset();document.getElementById("status").textContent="Preview transaction added in this session only. It is not saved permanently.";showPage("home");});
+updateCategories();render();
+</script>
 </body>
 </html>
