@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101827">
+  <title>Personal Finance Tracker</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root { color-scheme: dark; --bg:#101827; --panel:#1b2738; --muted:#9aa8bb; --text:#f4f7fb; --green:#35c98a; --red:#ff7777; --blue:#75a7ff; }
+    * { box-sizing:border-box; }
+    body { margin:0; padding:calc(20px + env(safe-area-inset-top)) 16px calc(24px + env(safe-area-inset-bottom)); background:var(--bg); color:var(--text); font:16px/1.45 system-ui,-apple-system,sans-serif; }
+    .app { max-width:520px; margin:auto; }
+    .top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:22px; }
+    h1 { margin:0; font-size:23px; }
+    .sub,.muted { color:var(--muted); font-size:13px; }
+    .pill { border:1px solid #34445b; border-radius:999px; padding:7px 11px; color:var(--muted); font-size:12px; }
+    .balance { background:linear-gradient(135deg,#263d5c,#1b2b42); border:1px solid #344b68; border-radius:20px; padding:20px; margin-bottom:16px; }
+    .balance .amount { font-size:32px; font-weight:750; margin:6px 0 2px; letter-spacing:-.7px; }
+    .cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+    .card { background:var(--panel); border:1px solid #2b394d; border-radius:16px; padding:15px; }
+    .card .value { font-size:20px; font-weight:700; margin-top:7px; }
+    .income { color:var(--green); } .expense { color:var(--red); }
+    .section-title { font-size:17px; font-weight:700; margin:22px 0 12px; }
+    .actions { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+    button { border:0; border-radius:13px; padding:14px 12px; color:#101827; background:#dce8f8; font:600 14px system-ui; cursor:pointer; }
+    button.primary { background:var(--green); }
+    button.secondary { background:#2a3b53; color:var(--text); border:1px solid #3a4d67; }
+    .accounts { display:grid; gap:10px; }
+    .account { display:flex; justify-content:space-between; align-items:center; gap:12px; background:var(--panel); border:1px solid #2b394d; border-radius:14px; padding:14px; }
+    .account strong { display:block; }
+    .account .right { text-align:right; font-weight:650; }
+    .nav { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-top:22px; }
+    .nav button { padding:11px 5px; font-size:12px; background:#202e42; color:var(--muted); }
+    .nav button.active { color:#101827; background:var(--green); }
+    .notice { margin-top:18px; color:var(--muted); font-size:12px; text-align:center; }
+    #message { min-height:20px; color:var(--blue); font-size:13px; margin-top:12px; text-align:center; }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="top">
+      <div><h1>My Finance</h1><div class="sub">Personal Finance Tracker</div></div>
+      <div class="pill" id="currency">USD · KHR</div>
+    </header>
+
+    <section class="balance">
+      <div class="muted">Tracked balance</div>
+      <div class="amount">0.00 USD</div>
+      <div class="sub">Activity from your tracker start date</div>
+    </section>
+
+    <section class="cards">
+      <div class="card"><div class="muted">Income</div><div class="value income">0.00 USD</div></div>
+      <div class="card"><div class="muted">Expenses</div><div class="value expense">0.00 USD</div></div>
+      <div class="card"><div class="muted">Savings</div><div class="value">0.00 USD</div></div>
+      <div class="card"><div class="muted">Net cash flow</div><div class="value">0.00 USD</div></div>
+    </section>
+
+    <div class="section-title">Quick actions</div>
+    <section class="actions">
+      <button class="primary" data-action="Income">＋ Add income</button>
+      <button data-action="Expense">－ Add expense</button>
+      <button class="secondary" data-action="Saving">＋ Add saving</button>
+      <button class="secondary" data-action="Transfer">⇄ Transfer</button>
+    </section>
+
+    <div class="section-title">Your accounts</div>
+    <section class="accounts">
+      <div class="account"><div><strong>ABA USD</strong><span class="muted">Checking account</span></div><div class="right">0.00 USD</div></div>
+      <div class="account"><div><strong>Canadia KHR</strong><span class="muted">Checking account</span></div><div class="right">0 KHR</div></div>
+    </section>
+
+    <nav class="nav" aria-label="Main navigation">
+      <button class="active" data-tab="Home">Home</button>
+      <button data-tab="Transactions">Activity</button>
+      <button data-tab="Reports">Reports</button>
+      <button data-tab="Settings">Settings</button>
+    </nav>
+    <div id="message" role="status"></div>
+    <div class="notice">Starter preview. Live balances and transactions will connect in later phases.</div>
+  </main>
+
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    document.querySelectorAll("[data-action]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.getElementById("message").textContent =
+          button.dataset.action + " form will be connected in the transaction phase.";
+      });
+    });
+
+    document.querySelectorAll("[data-tab]").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-tab]").forEach(item => item.classList.remove("active"));
+        button.classList.add("active");
+        document.getElementById("message").textContent =
+          button.dataset.tab + " page will be built in a later step.";
+      });
+    });
+  </script>
+</body>
+</html>
