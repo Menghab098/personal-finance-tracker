@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -7,122 +8,993 @@
 <title>My Finance</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
-:root{color-scheme:dark;--bg:#101827;--panel:#1b2738;--muted:#9aa8bb;--text:#f4f7fb;--green:#35c98a;--red:#ff7777;--line:#304057}
-*{box-sizing:border-box}body{margin:0;padding:calc(18px + env(safe-area-inset-top)) 15px calc(24px + env(safe-area-inset-bottom));background:var(--bg);color:var(--text);font:15px/1.45 system-ui,-apple-system,sans-serif}
-.app{max-width:540px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}h1{font-size:23px;margin:0}.muted,.hint{color:var(--muted);font-size:12px}.currency{border:1px solid var(--line);padding:6px 10px;border-radius:30px;font-size:12px;color:var(--muted)}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:16px;margin-bottom:13px}.hero{background:linear-gradient(135deg,#263d5c,#1b2b42);border-color:#3a5271}.hero .big{font-size:30px;font-weight:750;margin:5px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric .value{font-size:19px;font-weight:700;margin-top:5px}.income{color:var(--green)}.expense{color:var(--red)}
-h2{font-size:17px;margin:20px 0 10px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-button{border:0;border-radius:12px;padding:13px 11px;background:#dce8f8;color:#101827;font-weight:650;font-size:14px;cursor:pointer}button.primary{background:var(--green)}button.secondary{background:#2a3b53;color:var(--text);border:1px solid #3a4d67}button.danger{background:#63343c;color:#fff}
-.nav{position:sticky;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;background:#101827;padding:10px 0 calc(6px + env(safe-area-inset-bottom));margin-top:18px}
-.nav button{background:#202e42;color:var(--muted);padding:10px 3px;font-size:11px}.nav button.active{background:var(--green);color:#101827}
-.account,.transaction{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line)}.account:last-child,.transaction:last-child{border-bottom:0}
-.right{text-align:right;font-weight:650}.tag{font-size:11px;color:var(--muted)}
-label{display:block;font-size:13px;color:#c7d2e1;margin:12px 0 5px}input,select,textarea{width:100%;border:1px solid #3a4d67;background:#111d2d;color:var(--text);border-radius:10px;padding:12px;font:14px system-ui}textarea{min-height:70px;resize:vertical}.form-actions{display:flex;gap:9px;margin-top:16px}.form-actions button{flex:1}
-.page{display:none}.page.active{display:block}.empty{padding:20px;text-align:center;color:var(--muted);font-size:13px}.note{font-size:11px;color:var(--muted);text-align:center;margin:14px 0}
+:root {
+  color-scheme: dark;
+  --bg:#101827;
+  --panel:#1b2738;
+  --line:#304057;
+  --text:#f4f7fb;
+  --muted:#9aa8bb;
+  --green:#35c98a;
+  --red:#ff7777;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  padding:20px 15px 35px;
+  background:var(--bg);
+  color:var(--text);
+  font:15px/1.45 system-ui,sans-serif;
+}
+.app {max-width:540px;margin:auto}
+h1 {font-size:24px;margin:0}
+h2 {font-size:18px;margin:20px 0 10px}
+small,.muted {color:var(--muted)}
+header {margin-bottom:20px}
+.panel {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+  margin-bottom:12px;
+}
+.hero {background:linear-gradient(135deg,#263d5c,#1b2b42)}
+.big {font-size:23px;font-weight:750;margin-top:8px}
+.grid,.actions {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.metric {font-size:14px}
+.value {font-size:16px;font-weight:700;margin-top:6px}
+.income {color:var(--green)}
+.expense {color:var(--red)}
+button {
+  border:0;
+  border-radius:11px;
+  padding:12px;
+  background:#dce8f8;
+  color:#101827;
+  font-size:14px;
+  font-weight:650;
+  cursor:pointer;
+}
+button.primary {background:var(--green)}
+button.secondary {
+  background:#2a3b53;
+  color:var(--text);
+  border:1px solid #3a4d67;
+}
+button:disabled {opacity:.5}
+label {
+  display:block;
+  margin:13px 0 5px;
+  font-size:13px;
+  color:#c7d2e1;
+}
+input,select,textarea {
+  width:100%;
+  border:1px solid #3a4d67;
+  background:#111d2d;
+  color:var(--text);
+  border-radius:10px;
+  padding:12px;
+  font:14px system-ui;
+}
+textarea {min-height:70px}
+.row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+  padding:12px 0;
+  border-bottom:1px solid var(--line);
+}
+.row:last-child {border-bottom:0}
+.right {text-align:right;font-weight:650}
+.tag {font-size:11px;color:var(--muted)}
+.page {display:none}
+.page.active {display:block}
+.hidden {display:none}
+.nav {
+  position:sticky;
+  bottom:0;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+  background:var(--bg);
+  padding:12px 0;
+  margin-top:18px;
+}
+.nav button {
+  background:#202e42;
+  color:var(--muted);
+  padding:10px 3px;
+  font-size:11px;
+}
+.nav button.active {
+  background:var(--green);
+  color:#101827;
+}
+.status {
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  padding:12px;
+}
+.error {color:var(--red)}
+.empty {color:var(--muted);text-align:center;padding:20px}
 </style>
 </head>
 <body>
 <main class="app">
-<header class="top"><div><h1>My Finance</h1><div class="muted">Personal Finance Tracker</div></div><div class="currency">USD · KHR</div></header>
+
+<header>
+  <h1>My Finance</h1>
+  <small>Personal Finance Tracker · USD / KHR</small>
+</header>
 
 <section id="home" class="page active">
- <div class="panel hero"><div class="muted">Tracked balance</div><div class="big" id="totalBalance">0.00 USD</div><div class="hint">Activity from your tracker start date</div></div>
- <div class="grid">
-  <div class="panel metric"><div class="muted">Income</div><div class="value income" id="incomeTotal">0.00 USD</div></div>
-  <div class="panel metric"><div class="muted">Expenses</div><div class="value expense" id="expenseTotal">0.00 USD</div></div>
-  <div class="panel metric"><div class="muted">Savings</div><div class="value" id="savingTotal">0.00 USD</div></div>
-  <div class="panel metric"><div class="muted">Net cash flow</div><div class="value" id="netTotal">0.00 USD</div></div>
- </div>
- <h2>Quick actions</h2><div class="actions">
-  <button class="primary" data-new="Income">＋ Add income</button><button data-new="Expense">－ Add expense</button>
-  <button class="secondary" data-new="Saving">＋ Add saving</button><button class="secondary" data-new="Transfer">⇄ Transfer</button>
- </div>
- <h2>Your accounts</h2><div class="panel">
-  <div class="account"><div><strong>ABA USD</strong><div class="tag">Checking account</div></div><div class="right" id="abaBalance">0.00 USD</div></div>
-  <div class="account"><div><strong>Canadia KHR</strong><div class="tag">Checking account</div></div><div class="right" id="canadiaBalance">0 KHR</div></div>
- </div>
- <h2>Recent activity</h2><div class="panel" id="recent"><div class="empty">No transactions recorded.</div></div>
+  <div class="panel hero">
+    <small>Combined account balances</small>
+    <div class="big" id="totalBalance">Loading...</div>
+    <small>USD and KHR shown separately</small>
+  </div>
+
+  <div class="grid">
+    <div class="panel metric">
+      <small>Monthly income</small>
+      <div class="value income" id="incomeTotal">...</div>
+    </div>
+    <div class="panel metric">
+      <small>Monthly expenses</small>
+      <div class="value expense" id="expenseTotal">...</div>
+    </div>
+    <div class="panel metric">
+      <small>Monthly savings</small>
+      <div class="value" id="savingTotal">...</div>
+    </div>
+    <div class="panel metric">
+      <small>Net cash flow</small>
+      <div class="value" id="netTotal">...</div>
+    </div>
+  </div>
+
+  <h2>Quick actions</h2>
+  <div class="actions">
+    <button class="primary" data-new="Income">＋ Income</button>
+    <button data-new="Expense">－ Expense</button>
+    <button class="secondary" data-new="Saving">＋ Saving</button>
+    <button class="secondary" data-new="Transfer">⇄ Transfer</button>
+  </div>
+
+  <h2>Your accounts</h2>
+  <div class="panel" id="accountList"></div>
+
+  <h2>Recent activity</h2>
+  <div class="panel" id="recent"></div>
 </section>
 
 <section id="add" class="page">
- <h2 id="formTitle">Add transaction</h2>
- <div class="panel">
-  <form id="transactionForm">
-   <label for="type">Transaction type</label><select id="type"><option>Income</option><option>Expense</option><option>Saving</option><option>Transfer</option></select>
-   <label for="category">Category or source</label><select id="category"></select>
-   <label for="amount">Amount</label><input id="amount" type="number" min="0.01" step="0.01" placeholder="Enter amount" required>
-   <label for="currencySelect">Currency</label><select id="currencySelect"><option>USD</option><option>KHR</option></select>
-   <label for="date">Date</label><input id="date" type="date" required>
-   <label for="account">Account</label><select id="account"><option value="ABA USD">ABA USD</option><option value="Canadia KHR">Canadia KHR</option></select>
-   <label for="description">Description (optional)</label><textarea id="description" placeholder="Add a note"></textarea>
-   <div class="form-actions"><button type="button" class="secondary" id="cancelForm">Cancel</button><button type="submit" class="primary">Save preview</button></div>
-  </form>
-  <p class="hint">Preview only. This form does not save to Google Sheets yet.</p>
- </div>
+  <h2 id="formTitle">Add transaction</h2>
+  <div class="panel">
+    <form id="transactionForm">
+      <label>Transaction type</label>
+      <select id="type">
+        <option>Income</option>
+        <option>Expense</option>
+        <option>Saving</option>
+        <option>Transfer</option>
+      </select>
+
+      <div id="categoryWrap">
+        <label>Category or income source</label>
+        <select id="category"></select>
+      </div>
+
+      <label>Amount</label>
+      <input id="amount" type="number" min="0.000001"
+             step="any" required>
+
+      <label id="accountLabel">Account</label>
+      <select id="account"></select>
+
+      <div id="destinationWrap" class="hidden">
+        <label>Destination account</label>
+        <select id="destination"></select>
+
+        <label>Amount received</label>
+        <input id="destinationAmount" type="number"
+               min="0.000001" step="any">
+
+        <label>Exchange rate</label>
+        <input id="fxRate" type="number"
+               min="0.000001" step="any">
+        <small>Received amount per one source currency unit</small>
+      </div>
+
+      <p class="muted" id="currencyHint"></p>
+
+      <label>Transaction date</label>
+      <input id="date" type="date" required>
+
+      <div id="salaryWrap" class="hidden">
+        <label>Salary period (optional)</label>
+        <input id="salaryPeriod" placeholder="2026-11">
+
+        <label>Installment</label>
+        <select id="installment">
+          <option value="">None</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+        </select>
+      </div>
+
+      <label>Description</label>
+      <textarea id="description" maxlength="500"></textarea>
+
+      <div class="actions" style="margin-top:18px">
+        <button type="button" class="secondary"
+                id="cancelForm">Cancel</button>
+        <button type="submit" class="primary"
+                id="saveButton">Save</button>
+      </div>
+    </form>
+  </div>
 </section>
 
-<section id="activity" class="page"><h2>Transactions</h2><div class="panel" id="allTransactions"><div class="empty">No transactions recorded.</div></div></section>
-<section id="reports" class="page"><h2>Reports</h2><div class="panel"><div class="muted">Report periods</div><div class="actions" style="margin-top:12px"><button class="secondary">Daily</button><button class="secondary">Weekly</button><button class="secondary">Monthly</button><button class="secondary">Quarterly</button><button class="secondary">Yearly</button></div><p class="hint">Report calculations will connect to your transaction database later.</p></div></section>
-<section id="settings" class="page"><h2>Settings</h2><div class="panel"><div class="account"><div><strong>Timezone</strong><div class="tag">Asia/Phnom_Penh</div></div></div><div class="account"><div><strong>Supported currencies</strong><div class="tag">USD and KHR</div></div></div><div class="account"><div><strong>Reporting currency</strong><div class="tag">USD</div></div></div><div class="account"><div><strong>Opening balances</strong><div class="tag">Start from zero</div></div></div></div></section>
+<section id="activity" class="page">
+  <h2>Transactions</h2>
+  <div class="panel" id="allTransactions"></div>
+  <button class="secondary" id="refreshActivity">Refresh</button>
+</section>
+
+<section id="reports" class="page">
+  <h2>Reports</h2>
+  <div class="panel">
+    <div class="actions">
+      <button class="secondary" data-period="daily">Daily</button>
+      <button class="secondary" data-period="weekly">Weekly</button>
+      <button class="secondary" data-period="monthly">Monthly</button>
+      <button class="secondary" data-period="quarterly">Quarterly</button>
+      <button class="secondary" data-period="yearly">Yearly</button>
+    </div>
+
+    <label>Start date</label>
+    <input id="startDate" type="date">
+
+    <label>End date</label>
+    <input id="endDate" type="date">
+
+    <button class="primary" id="runReport"
+            style="width:100%;margin-top:14px">
+      Generate report
+    </button>
+  </div>
+  <div class="panel" id="reportResults">
+    <div class="empty">Choose a reporting period.</div>
+  </div>
+</section>
+
+<section id="settings" class="page">
+  <h2>Settings</h2>
+  <div class="panel">
+    <div class="row">Timezone <strong>Asia/Phnom_Penh</strong></div>
+    <div class="row">Currencies <strong>USD / KHR</strong></div>
+    <div class="row">Database <strong>Cloudflare D1</strong></div>
+    <div class="row">Opening balances <strong>Zero</strong></div>
+  </div>
+</section>
 
 <nav class="nav">
- <button class="active" data-page="home">Home</button><button data-page="activity">Activity</button><button data-page="reports">Reports</button><button data-page="settings">Settings</button>
+  <button class="active" data-page="home">Home</button>
+  <button data-page="activity">Activity</button>
+  <button data-page="reports">Reports</button>
+  <button data-page="settings">Settings</button>
 </nav>
-<p class="note" id="status">Starter interface. Live data connection comes later.</p>
-</main>
-<script>
-const tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand();}
-const API_URL = "https://personal-finance-api.engmenghab098.workers.dev";
- async function checkAuthentication() {
-  const status = document.getElementById("status");
 
-  if (!tg || !tg.initData) {
-    if (status) status.textContent = "Open this app through Telegram.";
+<p class="status" id="status">Connecting...</p>
+</main>
+
+<script>
+"use strict";
+
+const API =
+  "https://personal-finance-api.engmenghab098.workers.dev";
+
+const tg = window.Telegram?.WebApp;
+
+if (tg) {
+  tg.ready();
+  tg.expand();
+}
+
+const $ = id => document.getElementById(id);
+
+const ACCOUNTS = [
+  {id:"ACC001",name:"ABA USD",currency:"USD"},
+  {id:"ACC002",name:"Canadia KHR",currency:"KHR"},
+  {id:"ACC003",name:"ABA KHR",currency:"KHR"},
+  {id:"ACC004",name:"Canadia Saving",currency:"KHR"},
+  {id:"ACC005",name:"AC USD",currency:"USD"},
+  {id:"ACC006",name:"AC KHR",currency:"KHR"}
+];
+
+const SOURCES = [
+  "CNCC","UYFC","Royal Employee",
+  "Royal Employee 2","Bonus","Gift","Others"
+];
+
+const EXPENSES = [
+  "Food","Transportation","Shopping","Bills",
+  "Entertainment","Healthcare","Others"
+];
+
+const SAVINGS = [
+  "Personal","Future","Emergency Fund",
+  "Investment","Others"
+];
+
+let records = [];
+let balances = {};
+let authorized = false;
+let pending = null;
+
+function status(message, error=false) {
+  $("status").textContent = message;
+  $("status").classList.toggle("error", error);
+}
+
+function today() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone:"Asia/Phnom_Penh",
+    year:"numeric",
+    month:"2-digit",
+    day:"2-digit"
+  }).formatToParts(new Date());
+
+  const get = type => parts.find(p=>p.type===type).value;
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+
+function shiftDate(value, days) {
+  const d = new Date(value+"T12:00:00Z");
+  d.setUTCDate(d.getUTCDate()+days);
+  return d.toISOString().slice(0,10);
+}
+
+function money(amount, currency) {
+  const n = Number(amount)||0;
+  return currency==="KHR"
+    ? Math.round(n).toLocaleString()+" KHR"
+    : n.toFixed(2)+" USD";
+}
+
+function pair(values) {
+  return money(values.USD||0,"USD")+
+    " / "+money(values.KHR||0,"KHR");
+}
+
+function account(id) {
+  return ACCOUNTS.find(a=>a.id===id);
+}
+
+async function api(path, data={}) {
+  if (!tg?.initData) {
+    throw new Error("Open this app through Telegram.");
+  }
+
+  let response;
+
+  try {
+    response = await fetch(API+path, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        initData:tg.initData,
+        ...data
+      })
+    });
+  } catch {
+    throw new Error("Network error. Check your connection.");
+  }
+
+  let result;
+
+  try {
+    result = await response.json();
+  } catch {
+    throw new Error("Invalid server response.");
+  }
+
+  if (!response.ok) {
+    throw new Error(result.error||"Server error.");
+  }
+
+  return result;
+}
+
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(p=>{
+    p.classList.toggle("active",p.id===name);
+  });
+
+  document.querySelectorAll("[data-page]").forEach(b=>{
+    b.classList.toggle("active",b.dataset.page===name);
+  });
+}
+
+function options(element, values) {
+  element.replaceChildren();
+
+  values.forEach(item=>{
+    const option = document.createElement("option");
+    option.value = item.value;
+    option.textContent = item.label;
+    element.append(option);
+  });
+}
+
+function type() {
+  return $("type").value;
+}
+
+function isTransfer() {
+  return type()==="Transfer"||type()==="Saving";
+}
+
+function sourceCurrency() {
+  return account($("account").value)?.currency||"USD";
+}
+
+function destinationCurrency() {
+  return account($("destination").value)?.currency||"USD";
+}
+
+function refreshForm() {
+  const current = type();
+  const transfer = isTransfer();
+
+  $("destinationWrap").classList.toggle("hidden",!transfer);
+  $("categoryWrap").classList.toggle(
+    "hidden",current==="Transfer"
+  );
+  $("salaryWrap").classList.toggle(
+    "hidden",current!=="Income"
+  );
+
+  $("accountLabel").textContent =
+    current==="Income"?"Deposit into account":"From account";
+
+  const previous = $("category").value;
+
+  const categories =
+    current==="Income"?SOURCES:
+    current==="Expense"?EXPENSES:
+    current==="Saving"?SAVINGS:[];
+
+  options(
+    $("category"),
+    categories.map(v=>({value:v,label:v}))
+  );
+
+  if (categories.includes(previous)) {
+    $("category").value = previous;
+  }
+
+  const src = sourceCurrency();
+  const dst = destinationCurrency();
+
+  $("currencyHint").textContent = transfer
+    ? `Sending ${src}, receiving ${dst}`
+    : `Amount currency: ${src}`;
+
+  $("destinationAmount").required = transfer;
+  $("fxRate").required = transfer&&src!==dst;
+  $("fxRate").disabled = !transfer||src===dst;
+
+  if (transfer&&src===dst) {
+    $("fxRate").value = "";
+    $("destinationAmount").value = $("amount").value;
+  }
+}
+
+function openForm(selectedType) {
+  $("transactionForm").reset();
+  pending = null;
+  $("type").value = selectedType;
+  $("account").value = "ACC001";
+  $("destination").value = "ACC002";
+  $("date").value = today();
+  refreshForm();
+
+  $("formTitle").textContent =
+    "Add "+selectedType.toLowerCase();
+
+  showPage("add");
+}
+
+function addText(parent, tag, text, className="") {
+  const element = document.createElement(tag);
+  element.textContent = text;
+  if (className) element.className = className;
+  parent.append(element);
+  return element;
+}
+
+function renderTransactions(target, items) {
+  const root = $(target);
+  root.replaceChildren();
+
+  if (!items.length) {
+    addText(root,"div","No transactions recorded.","empty");
+    return;
+  }
+
+  for (const r of items) {
+    const line = document.createElement("div");
+    line.className = "row";
+
+    const left = document.createElement("div");
+    const label =
+      r.Transaction_Type==="Income"
+        ? r.Source_ID
+        : r.Transaction_Type==="Expense"
+        ? r.Category_ID
+        : r.Transfer_Purpose;
+
+    addText(
+      left,"strong",
+      `${r.Transaction_Type} · ${label||""}`
+    );
+
+    const source = r.Transaction_Type==="Income"
+      ? r.To_Account_ID
+      : r.From_Account_ID;
+
+    let detail =
+      `${r.Transaction_Date} · ${account(source)?.name||""}`;
+
+    if (r.Transaction_Type==="Transfer") {
+      detail += ` → ${account(r.To_Account_ID)?.name||""}`;
+    }
+
+    addText(left,"div",detail,"tag");
+
+    const right = document.createElement("div");
+    right.className = "right";
+
+    addText(right,"div",money(r.Amount,r.Currency));
+
+    if (r.Transaction_Type==="Transfer") {
+      addText(
+        right,"div",
+        "Received "+money(
+          r.Destination_Amount,
+          r.Destination_Currency
+        ),
+        "tag"
+      );
+    }
+
+    line.append(left,right);
+    root.append(line);
+  }
+}
+
+function render() {
+  const total = {USD:0,KHR:0};
+
+  $("accountList").replaceChildren();
+
+  for (const a of ACCOUNTS) {
+    const balance = Number(balances[a.id]?.balance)||0;
+    total[a.currency] += balance;
+
+    const row = document.createElement("div");
+    row.className = "row";
+
+    const left = document.createElement("div");
+    addText(left,"strong",a.name);
+    addText(left,"div",a.currency,"tag");
+
+    addText(row,"div","");
+
+    row.replaceChildren(left);
+
+    addText(
+      row,"strong",
+      money(balance,a.currency),
+      "right"
+    );
+
+    $("accountList").append(row);
+  }
+
+  $("totalBalance").textContent = pair(total);
+
+  renderTransactions("recent",records.slice(0,6));
+  renderTransactions("allTransactions",records);
+
+  const month = today().slice(0,7);
+
+  const income = {USD:0,KHR:0};
+  const expense = {USD:0,KHR:0};
+  const saving = {USD:0,KHR:0};
+
+  for (const r of records) {
+    if (!r.Transaction_Date?.startsWith(month)) continue;
+
+    const c = r.Currency;
+    const amount = Number(r.Amount)||0;
+
+    if (r.Transaction_Type==="Income") {
+      income[c] += amount;
+    }
+
+    if (r.Transaction_Type==="Expense") {
+      expense[c] += amount;
+    }
+
+    if (
+      r.Transaction_Type==="Transfer" &&
+      r.Transfer_Purpose==="Saving"
+    ) {
+      saving[c] += amount;
+    }
+  }
+
+  $("incomeTotal").textContent = pair(income);
+  $("expenseTotal").textContent = pair(expense);
+  $("savingTotal").textContent = pair(saving);
+
+  $("netTotal").textContent = pair({
+    USD:income.USD-expense.USD,
+    KHR:income.KHR-expense.KHR
+  });
+}
+
+async function loadData() {
+  const [history, accountBalances] = await Promise.all([
+    api("/transactions/list"),
+    api("/balances")
+  ]);
+
+  records = history.transactions||[];
+  balances = accountBalances.balances||{};
+
+  render();
+}
+
+function transactionPayload() {
+  const current = type();
+  const transfer = isTransfer();
+  const from = $("account").value;
+  const to = $("destination").value;
+  const amount = Number($("amount").value);
+  const currency = sourceCurrency();
+
+  if (!Number.isFinite(amount)||amount<=0) {
+    throw new Error("Enter a positive amount.");
+  }
+
+  if (transfer&&from===to) {
+    throw new Error("Select different accounts.");
+  }
+
+  const received = transfer
+    ? Number($("destinationAmount").value)
+    : null;
+
+  if (
+    transfer&&
+    (!Number.isFinite(received)||received<=0)
+  ) {
+    throw new Error("Enter a valid received amount.");
+  }
+
+  const dst = transfer?destinationCurrency():"";
+
+  const fx = transfer&&currency!==dst
+    ? Number($("fxRate").value)
+    : null;
+
+  if (
+    transfer&&currency!==dst&&
+    (!Number.isFinite(fx)||fx<=0)
+  ) {
+    throw new Error("Enter a valid exchange rate.");
+  }
+
+  if (
+    transfer&&currency===dst&&
+    Math.abs(amount-received)>0.000001
+  ) {
+    throw new Error("Same-currency amounts must match.");
+  }
+
+  if (
+    transfer&&currency!==dst&&
+    Math.abs(amount*fx-received)>(dst==="KHR"?1:0.01)
+  ) {
+    throw new Error("Received amount does not match rate.");
+  }
+
+  return {
+    Transaction_ID:crypto.randomUUID(),
+    Transaction_Date:$("date").value,
+    Transaction_Type:transfer?"Transfer":current,
+    Source_ID:current==="Income"?$("category").value:"",
+    Category_ID:
+      current==="Expense"||current==="Saving"
+        ? $("category").value
+        : "",
+    Amount:amount,
+    Currency:currency,
+    From_Account_ID:current==="Income"?"":from,
+    To_Account_ID:
+      current==="Income"?from:transfer?to:"",
+    Destination_Amount:received,
+    Destination_Currency:dst,
+    Transfer_Purpose:transfer
+      ? current==="Saving"?"Saving":"General Transfer"
+      : "",
+    FX_Rate:fx,
+    Converted_Amount:null,
+    Salary_Period_ID:current==="Income"
+      ? $("salaryPeriod").value.trim()
+      : "",
+    Installment:
+      current==="Income"&&$("installment").value
+        ? Number($("installment").value)
+        : null,
+    Description:$("description").value.trim()
+  };
+}
+
+async function saveTransaction(event) {
+  event.preventDefault();
+
+  if (!authorized) {
+    status("Authentication required.",true);
+    return;
+  }
+
+  const button = $("saveButton");
+  button.disabled = true;
+
+  try {
+    if (!pending) {
+      pending = transactionPayload();
+    }
+
+    const result = await api("/transactions",{
+      transaction:pending
+    });
+
+    if (!result.success) {
+      throw new Error("Transaction was not saved.");
+    }
+
+    pending = null;
+    $("transactionForm").reset();
+
+    showPage("home");
+
+    status(
+      "Transaction saved to D1. Google Sheets sync "+
+      "is separate."
+    );
+
+    await loadData();
+  } catch (error) {
+    status(error.message,true);
+  } finally {
+    button.disabled = false;
+  }
+}
+
+function reportPeriod(period) {
+  const d = today();
+  const year = Number(d.slice(0,4));
+  const month = Number(d.slice(5,7));
+
+  let start = d;
+  let end = d;
+
+  if (period==="weekly") {
+    const weekday =
+      new Date(d+"T12:00:00Z").getUTCDay();
+
+    start = shiftDate(d,-((weekday+6)%7));
+    end = shiftDate(start,6);
+  }
+
+  if (period==="monthly") {
+    start = d.slice(0,7)+"-01";
+    end = shiftDate(
+      shiftDate(start,32).slice(0,7)+"-01",
+      -1
+    );
+  }
+
+  if (period==="quarterly") {
+    const firstMonth =
+      Math.floor((month-1)/3)*3+1;
+
+    start =
+      year+"-"+String(firstMonth).padStart(2,"0")+"-01";
+
+    const next = new Date(
+      Date.UTC(year,firstMonth+2,1)
+    );
+
+    end = shiftDate(
+      next.toISOString().slice(0,10),
+      -1
+    );
+  }
+
+  if (period==="yearly") {
+    start = year+"-01-01";
+    end = year+"-12-31";
+  }
+
+  $("startDate").value = start;
+  $("endDate").value = end;
+
+  runReport();
+}
+
+async function runReport() {
+  try {
+    const result = await api("/report",{
+      start_date:$("startDate").value,
+      end_date:$("endDate").value
+    });
+
+    const root = $("reportResults");
+    root.replaceChildren();
+
+    for (const c of ["USD","KHR"]) {
+      addText(root,"h2",c);
+
+      for (const key of ["income","expense","transfer"]) {
+        const row = document.createElement("div");
+        row.className = "row";
+
+        addText(
+          row,"span",
+          key[0].toUpperCase()+key.slice(1)
+        );
+
+        addText(
+          row,"strong",
+          money(result.totals?.[c]?.[key]||0,c)
+        );
+
+        root.append(row);
+      }
+    }
+
+    status("Report loaded.");
+  } catch (error) {
+    status(error.message,true);
+  }
+}
+
+async function start() {
+  if (!tg?.initData) {
+    status("Open this app through Telegram.",true);
     return;
   }
 
   try {
-    const response = await fetch(`${API_URL}/auth`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        initData: tg.initData
-      })
-    });
+    await api("/auth");
+    authorized = true;
 
-    const result = await response.json();
+    status("Authenticated. Loading transactions...");
 
-    if (response.ok && result.authenticated === true) {
-      if (status) status.textContent = "Telegram authentication successful.";
-    } else {
-      if (status) status.textContent = "Telegram authentication failed.";
-    }
+    await loadData();
+
+    status("Connected. Transactions stored in D1.");
   } catch (error) {
-    if (status) status.textContent = "Connection error. Please try again.";
+    status(error.message,true);
   }
 }
 
-document.addEventListener("DOMContentLoaded", checkAuthentication);
-const categoryMap={
- Income:["Salary","Bonus","Gift","Others"],
- Expense:["Food","Transportation","Shopping","Bills","Entertainment","Healthcare","Others"],
- Saving:["Personal","Future","Emergency Fund","Investment","Others"],
- Transfer:["General Transfer","Saving"]
-};
-const records=[];
-const money=(n,c)=>c==="KHR"?Math.round(n).toLocaleString()+" KHR":Number(n).toFixed(2)+" USD";
-function showPage(name){document.querySelectorAll(".page").forEach(p=>p.classList.toggle("active",p.id===name));document.querySelectorAll("[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===name));}
-function updateCategories(){const type=document.getElementById("type").value;const select=document.getElementById("category");select.innerHTML="";categoryMap[type].forEach(c=>{const o=document.createElement("option");o.textContent=c;select.appendChild(o);});}
-function render(){const totals={Income:0,Expense:0,Saving:0};records.forEach(r=>{if(totals[r.type]!==undefined&&r.currency==="USD")totals[r.type]+=r.amount;});document.getElementById("incomeTotal").textContent=money(totals.Income,"USD");document.getElementById("expenseTotal").textContent=money(totals.Expense,"USD");document.getElementById("savingTotal").textContent=money(totals.Saving,"USD");document.getElementById("netTotal").textContent=money(totals.Income-totals.Expense,"USD");document.getElementById("totalBalance").textContent=money(totals.Income-totals.Expense,"USD");const rows=records.slice().reverse().map(r=>`<div class="transaction"><div><strong>${r.type} · ${r.category}</strong><div class="tag">${r.date} · ${r.account}</div></div><div class="right">${money(r.amount,r.currency)}</div></div>`).join("")||'<div class="empty">No transactions recorded.</div>';document.getElementById("recent").innerHTML=rows;document.getElementById("allTransactions").innerHTML=rows;}
-function openForm(type){document.getElementById("type").value=type;updateCategories();document.getElementById("formTitle").textContent="Add "+type.toLowerCase();document.getElementById("date").value=new Date().toISOString().slice(0,10);showPage("add");}
-document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
-document.querySelectorAll("[data-new]").forEach(b=>b.addEventListener("click",()=>openForm(b.dataset.new)));
-document.getElementById("type").addEventListener("change",updateCategories);
-document.getElementById("cancelForm").addEventListener("click",()=>showPage("home"));
-document.getElementById("transactionForm").addEventListener("submit",e=>{e.preventDefault();const amount=Number(document.getElementById("amount").value);if(!(amount>0))return;records.push({type:document.getElementById("type").value,category:document.getElementById("category").value,amount,currency:document.getElementById("currencySelect").value,date:document.getElementById("date").value,account:document.getElementById("account").value});render();e.target.reset();document.getElementById("status").textContent="Preview transaction added in this session only. It is not saved permanently.";showPage("home");});
-updateCategories();render();
+options(
+  $("account"),
+  ACCOUNTS.map(a=>({
+    value:a.id,
+    label:`${a.name} (${a.currency})`
+  }))
+);
+
+options(
+  $("destination"),
+  ACCOUNTS.map(a=>({
+    value:a.id,
+    label:`${a.name} (${a.currency})`
+  }))
+);
+
+$("destination").value = "ACC002";
+
+$("type").addEventListener("change",()=>{
+  pending=null;
+  refreshForm();
+});
+
+$("account").addEventListener("change",()=>{
+  pending=null;
+  refreshForm();
+});
+
+$("destination").addEventListener("change",()=>{
+  pending=null;
+  refreshForm();
+});
+
+$("amount").addEventListener("input",()=>{
+  pending=null;
+
+  if (
+    isTransfer()&&
+    sourceCurrency()===destinationCurrency()
+  ) {
+    $("destinationAmount").value = $("amount").value;
+  }
+});
+
+$("transactionForm").addEventListener("input",event=>{
+  if (event.target.id!=="amount") pending=null;
+});
+
+$("transactionForm").addEventListener(
+  "submit",saveTransaction
+);
+
+$("cancelForm").addEventListener("click",()=>{
+  pending=null;
+  showPage("home");
+});
+
+document.querySelectorAll("[data-page]").forEach(b=>{
+  b.addEventListener("click",()=>{
+    showPage(b.dataset.page);
+  });
+});
+
+document.querySelectorAll("[data-new]").forEach(b=>{
+  b.addEventListener("click",()=>{
+    openForm(b.dataset.new);
+  });
+});
+
+document.querySelectorAll("[data-period]").forEach(b=>{
+  b.addEventListener("click",()=>{
+    reportPeriod(b.dataset.period);
+  });
+});
+
+$("runReport").addEventListener("click",runReport);
+
+$("refreshActivity").addEventListener("click",async()=>{
+  try {
+    await loadData();
+    status("Transactions refreshed.");
+  } catch (error) {
+    status(error.message,true);
+  }
+});
+
+$("date").value = today();
+$("startDate").value = today().slice(0,7)+"-01";
+$("endDate").value = today();
+
+refreshForm();
+start();
 </script>
 </body>
 </html>
