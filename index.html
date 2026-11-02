@@ -73,6 +73,38 @@ label{display:block;font-size:13px;color:#c7d2e1;margin:12px 0 5px}input,select,
 <script>
 const tg=window.Telegram&&window.Telegram.WebApp;if(tg){tg.ready();tg.expand();}
 const API_URL = "https://personal-finance-api.engmenghab098.workers.dev";
+ async function checkAuthentication() {
+  const status = document.getElementById("status");
+
+  if (!tg || !tg.initData) {
+    if (status) status.textContent = "Open this app through Telegram.";
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/auth`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        initData: tg.initData
+      })
+    });
+
+    const result = await response.json();
+
+    if (response.ok && result.authenticated === true) {
+      if (status) status.textContent = "Telegram authentication successful.";
+    } else {
+      if (status) status.textContent = "Telegram authentication failed.";
+    }
+  } catch (error) {
+    if (status) status.textContent = "Connection error. Please try again.";
+  }
+}
+
+document.addEventListener("DOMContentLoaded", checkAuthentication);
 const categoryMap={
  Income:["Salary","Bonus","Gift","Others"],
  Expense:["Food","Transportation","Shopping","Bills","Entertainment","Healthcare","Others"],
